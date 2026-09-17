@@ -28,7 +28,7 @@ const safe=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 // ---- 사진: 여러 장, 잘리지 않게 ----
 function renderPhotos(){
   const tiles=photos.map((photo,i)=>`<figure class="photo-tile"><img src="${photo.url}" alt="선택한 사진 ${i+1}"><button type="button" class="photo-remove" data-index="${i}" aria-label="사진 ${i+1} 삭제">×</button></figure>`);
-  if(photos.length<MAX_PHOTOS)tiles.push(`<label class="photo-add" for="photo"><b>＋</b><span>${photos.length?'사진 추가':'사진 선택'}</span><small>${photos.length}/${MAX_PHOTOS} · JPG·PNG</small></label>`);
+  if(photos.length<MAX_PHOTOS)tiles.push(`<label class="photo-add" for="photo"><b>＋</b><span>${photos.length?'사진 추가':'사진 선택'}</span><small>${photos.length}/${MAX_PHOTOS}</small></label>`);
   $('#photoGrid').innerHTML=tiles.join('');
   $('#photoGrid').classList.toggle('empty',!photos.length);
 }

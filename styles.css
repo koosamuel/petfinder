@@ -4,21 +4,21 @@
 
 /* ---- 사진 여러 장 (잘리지 않게) ---- */
 .photo-picker #photo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-radius:18px;transition:.2s}
+.photo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;border-radius:18px;transition:.2s}
 .photo-grid.dragging{outline:2px dashed var(--green);outline-offset:4px}
-.photo-tile,.photo-add{position:relative;margin:0;aspect-ratio:1;border-radius:14px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.photo-tile,.photo-add{position:relative;margin:0;aspect-ratio:1;border-radius:10px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
 .photo-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-.photo-remove{position:absolute;z-index:1;top:5px;right:5px;width:26px;height:26px;min-height:0;padding:0;border-radius:50%;background:rgba(24,51,45,.78);font-size:16px;line-height:1;justify-content:center;align-items:center}
+.photo-remove{position:absolute;z-index:1;top:3px;right:3px;width:20px;height:20px;min-height:0;padding:0;border-radius:50%;background:rgba(24,51,45,.78);font-size:13px;line-height:1;justify-content:center;align-items:center}
 .photo-remove:hover{background:var(--accent);transform:none}
 .photo-add{border:1.5px dashed #aab7b0;cursor:pointer;text-align:center;align-content:center;gap:2px;transition:.2s}
 .photo-add:hover{border-color:var(--green);transform:translateY(-1px)}
-.photo-add b{font-size:22px;line-height:1;color:var(--green)}
-.photo-add span{font-size:13px;font-weight:700}
+.photo-add b{font-size:18px;line-height:1;color:var(--green)}
+.photo-add span{font-size:11px;font-weight:700;white-space:nowrap}
 .photo-add small{font-size:10px;color:var(--muted)}
 .photo-grid.empty{grid-template-columns:1fr}
-.photo-grid.empty .photo-add{aspect-ratio:auto;height:190px}
-.photo-grid.empty .photo-add b{font-size:28px}
-.photo-grid.empty .photo-add span{font-size:17px}
+.photo-grid.empty .photo-add{aspect-ratio:auto;height:120px;border-radius:14px}
+.photo-grid.empty .photo-add b{font-size:24px}
+.photo-grid.empty .photo-add span{font-size:15px}
 .field-hint{font-size:11px;color:var(--muted);margin:8px 2px 0}
 
 /* ---- 입력 필드 ---- */

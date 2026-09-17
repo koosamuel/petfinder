@@ -53,7 +53,7 @@ h1 { font-size: clamp(38px, 4.7vw, 58px); line-height: 1.08; margin: 10px 0 14px
 }
 
 @media (max-width: 600px) {
-  .photo-grid { gap: 6px; }
+  .photo-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
   .region-row { grid-template-columns: 1fr; }
   .fields select { padding: 12px; font-size: 16px; }
 }
