@@ -39,3 +39,14 @@
 .pager span{font-size:12px;color:var(--muted);text-align:center}
 .reroll{background:#fff;color:var(--ink);border:1px solid var(--line)}
 .reroll:hover{background:var(--soft);color:var(--ink)}
+
+/* ---- 결과 → animal.go.kr 공고 ---- */
+.candidate-link{color:inherit;text-decoration:none;transition:.2s}
+.candidate-link:hover{border-color:var(--green);box-shadow:0 8px 22px rgba(24,51,45,.1);transform:translateY(-1px)}
+.candidate-link:focus-visible{outline:3px solid rgba(30,102,86,.35);outline-offset:2px}
+.candidate .care{color:var(--ink);font-weight:600}
+.candidate .notice-link{color:var(--green);font-weight:700}
+.state-badge{display:inline-block;vertical-align:2px;margin-left:4px;padding:1px 7px;border-radius:999px;background:var(--soft);color:var(--green);font-size:10px;font-weight:800}
+.state-badge.ended{background:#efece3;color:var(--muted)}
+.candidate.ended{background:#faf9f5}
+.candidate.ended .result-photo,.candidate.ended .score strong{opacity:.55}

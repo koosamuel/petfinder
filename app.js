@@ -74,9 +74,16 @@ function featureText(){
 
 // ---- 결과: 10개씩 보기 ----
 function renderStatic(list){ranked=[];$('#pager').hidden=true;results.innerHTML=list.map((x,i)=>`<article class="candidate"><div class="dog" aria-hidden="true">🐕</div><div><h3>${i+1}. ${x.name}</h3><p>${x.place} · ${x.date}</p><p>근거: ${x.why}</p></div><div class="score"><strong>${x.score}%</strong><small>예시 유사도</small></div></article>`).join('')}
+// 국가동물보호정보시스템 공고 상세 페이지. animal_id가 공고번호(desertionNo)다.
+const noticeUrl=id=>/^\d{10,20}$/.test(String(id??''))?`https://www.animal.go.kr/front/awtis/public/publicDtl.do?desertionNo=${id}`:'';
 function renderLivePage(){
   const start=page*PAGE_SIZE,list=ranked.slice(start,start+PAGE_SIZE);
-  results.innerHTML=list.map((x,i)=>`<article class="candidate"><img class="dog result-photo" src="${apiBase}/api/public/animals/${encodeURIComponent(x.animal_id)}/image?slot=${encodeURIComponent(x.image_slot||'popfile1')}" alt="${safe(x.kind_name||'보호 공고')} 후보 사진" loading="lazy"><div><h3>${start+i+1}. ${safe(x.kind_name||'품종 미상')} · ${safe(x.sex||'성별 미상')}</h3><p>${safe(x.happen_place||'발견 장소 미상')} · ${safe(x.happen_date||'날짜 미상')}</p><p>근거: ${safe(x.rationale||'이미지 유사도')}${x.photoHits>1?` · 사진 ${x.photoHits}장에서 발견`:''}</p></div><div class="score"><strong>${(Number(x.final_score||0)*100).toFixed(1)}%</strong><small>후보 점수</small></div></article>`).join('');
+  results.innerHTML=list.map((x,i)=>{
+    const url=noticeUrl(x.animal_id),state=String(x.process_state||''),ended=state.startsWith('종료');
+    const body=`<img class="dog result-photo" src="${apiBase}/api/public/animals/${encodeURIComponent(x.animal_id)}/image?slot=${encodeURIComponent(x.image_slot||'popfile1')}" alt="${safe(x.kind_name||'보호 공고')} 후보 사진" loading="lazy"><div><h3>${start+i+1}. ${safe(x.kind_name||'품종 미상')} · ${safe(x.sex||'성별 미상')}${state?` <span class="state-badge${ended?' ended':''}">${safe(state)}</span>`:''}</h3><p>${safe(x.happen_place||'발견 장소 미상')} · ${safe(x.happen_date||'날짜 미상')}</p>${x.care_name?`<p class="care">${safe(x.care_name)}</p>`:''}<p>근거: ${safe(x.rationale||'이미지 유사도')}${x.photoHits>1?` · 사진 ${x.photoHits}장에서 발견`:''}</p>${url?'<p class="notice-link">공고 보기 ↗</p>':''}</div><div class="score"><strong>${(Number(x.final_score||0)*100).toFixed(1)}%</strong><small>후보 점수</small></div>`;
+    const cls=`candidate${ended?' ended':''}`;
+    return url?`<a class="${cls} candidate-link" href="${url}" target="_blank" rel="noopener noreferrer" aria-label="${safe(x.kind_name||'보호 공고')} 공고를 국가동물보호정보시스템에서 보기 (새 탭)">${body}</a>`:`<article class="${cls}">${body}</article>`;
+  }).join('');
   const pages=Math.ceil(ranked.length/PAGE_SIZE),last=page>=pages-1;
   $('#pager').hidden=pages<=1;
   $('#pageInfo').textContent=`${start+1}–${start+list.length}위 / 전체 ${ranked.length}개`;
