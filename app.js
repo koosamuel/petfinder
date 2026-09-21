@@ -18,7 +18,7 @@ const demos=[
   {id:'shiba',label:'예시 1',name:'갈색 시바',image:'./assets/demo-shiba.jpg',breed:'시바',furColor:'갈색',weight:'',tail:'말린 꼬리',feature:'뾰족한 귀, 중형견',sido:'경기도',sigungu:'화성시',date:'2026-09-08',animalId:'441553202602531',availablePhotos:2},
   {id:'dachshund',label:'예시 2',name:'닥스훈트',image:'./assets/demo-dachshund.jpg',breed:'닥스훈트',furColor:'검정·갈색',weight:'',tail:'',feature:'긴 몸, 짧은 다리',sido:'경기도',sigungu:'안성시',date:'2026-09-08',animalId:'441408202601716',availablePhotos:2}
 ];
-const MAX_PHOTOS=5,PAGE_SIZE=10,SERVER_TOP_K=20,UNKNOWN_BREED='모름',OTHER_SIGUNGU='__other__';
+const MAX_PHOTOS=5,PAGE_SIZE=5,SERVER_TOP_K=10,UNKNOWN_BREED='모름',OTHER_SIGUNGU='__other__';
 const $=selector=>document.querySelector(selector);
 const results=$('#results');
 const button=$('#search');
@@ -81,7 +81,7 @@ function featureText(){
   return [breed===UNKNOWN_BREED?'':breed,$('#furColor').value.trim(),weight?`${weight}kg`:'',$('#tail').value.trim(),$('#features').value.trim()].filter(Boolean).join(', ');
 }
 
-// ---- 결과: 10개씩 보기 ----
+// ---- 결과: 처음 5개, 요청 시 나머지 5개 더 보기 ----
 function renderStatic(list){ranked=[];$('#pager').hidden=true;results.innerHTML=list.map((x,i)=>`<article class="candidate"><div class="dog" aria-hidden="true">🐕</div><div><h3>${i+1}. ${x.name}</h3><p>${x.place} · ${x.date}</p></div><div class="score"><strong>${x.score}%</strong><small>예시 유사도</small></div></article>`).join('')}
 // 국가동물보호정보시스템 공고 상세 페이지. animal_id가 공고번호(desertionNo)다.
 const noticeUrl=id=>/^\d{10,20}$/.test(String(id??''))?`https://www.animal.go.kr/front/awtis/public/publicDtl.do?desertionNo=${id}`:'';
@@ -94,21 +94,23 @@ function scoreBreakdown(item){
   return item.rationale?`<p><b>항목별 유사도</b> · ${safe(item.rationale)}</p>`:'';
 }
 function renderLivePage(){
-  const start=page*PAGE_SIZE,list=ranked.slice(start,start+PAGE_SIZE);
+  const visibleCount=Math.min((page+1)*PAGE_SIZE,ranked.length),list=ranked.slice(0,visibleCount);
   results.innerHTML=list.map((x,i)=>{
     const url=noticeUrl(x.animal_id),state=String(x.process_state||''),ended=state.startsWith('종료');
     const metadataReasons=[];
     if(x.location_score!==null&&x.location_score!==undefined)metadataReasons.push(`위치: ${x.location_reason}`);
     if(x.date_score!==null&&x.date_score!==undefined)metadataReasons.push(`날짜: ${x.date_reason}`);
-    const reasonDetail=metadataReasons.length?`<p>${safe(metadataReasons.join(' · '))}</p>`:'';
-    const body=`<img class="dog result-photo" src="${apiBase}/api/public/animals/${encodeURIComponent(x.animal_id)}/image?slot=${encodeURIComponent(x.image_slot||'popfile1')}" alt="${safe(x.kind_name||'보호 공고')} 후보 사진" loading="lazy"><div><h3>${start+i+1}. ${safe(x.kind_name||'품종 미상')} · ${safe(x.sex||'성별 미상')}${state?` <span class="state-badge${ended?' ended':''}">${safe(state)}</span>`:''}</h3><p>${safe(x.happen_place||'발견 장소 미상')} · ${safe(x.happen_date||'날짜 미상')}</p>${x.care_name?`<p class="care">${safe(x.care_name)}</p>`:''}${scoreBreakdown(x)}${reasonDetail}${x.photoHits>1?`<p>사진 ${x.photoHits}장에서 발견</p>`:''}${url?'<p class="notice-link">공고 보기 ↗</p>':''}</div><div class="score"><strong>${(Number(x.final_score||0)*100).toFixed(1)}%</strong><small>후보 점수</small></div>`;
+    const reasonDetail=metadataReasons.length?`<details class="reason-details"><summary>위치·날짜 근거 보기</summary><p>${safe(metadataReasons.join(' · '))}</p></details>`:'';
+    const noticeLink=url?`<a class="notice-link" href="${url}" target="_blank" rel="noopener noreferrer">공고 보기 ↗</a>`:'';
+    const body=`<img class="dog result-photo" src="${apiBase}/api/public/animals/${encodeURIComponent(x.animal_id)}/image?slot=${encodeURIComponent(x.image_slot||'popfile1')}" alt="${safe(x.kind_name||'보호 공고')} 후보 사진" loading="lazy"><div><h3>${i+1}. ${safe(x.kind_name||'품종 미상')} · ${safe(x.sex||'성별 미상')}${state?` <span class="state-badge${ended?' ended':''}">${safe(state)}</span>`:''}</h3><p>${safe(x.happen_place||'발견 장소 미상')} · ${safe(x.happen_date||'날짜 미상')}</p>${x.care_name?`<p class="care">${safe(x.care_name)}</p>`:''}${scoreBreakdown(x)}${reasonDetail}${x.photoHits>1?`<p>사진 ${x.photoHits}장에서 발견</p>`:''}${noticeLink}</div><div class="score"><strong>${(Number(x.final_score||0)*100).toFixed(1)}%</strong><small>후보 점수</small></div>`;
     const cls=`candidate${ended?' ended':''}`;
-    return url?`<a class="${cls} candidate-link" href="${url}" target="_blank" rel="noopener noreferrer" aria-label="${safe(x.kind_name||'보호 공고')} 공고를 국가동물보호정보시스템에서 보기 (새 탭)">${body}</a>`:`<article class="${cls}">${body}</article>`;
+    return `<article class="${cls}">${body}</article>`;
   }).join('');
-  const pages=Math.ceil(ranked.length/PAGE_SIZE),last=page>=pages-1;
-  $('#pager').hidden=pages<=1;
-  $('#pageInfo').textContent=`${start+1}–${start+list.length}위 / 전체 ${ranked.length}개`;
-  $('#reroll').firstChild.textContent=last?'처음 10개 다시 보기 ':`다음 후보 ${Math.min(PAGE_SIZE,ranked.length-start-PAGE_SIZE)}개 `;
+  const remaining=ranked.length-visibleCount;
+  $('#pager').hidden=ranked.length<=PAGE_SIZE;
+  $('#pageInfo').textContent=`1–${visibleCount}위 / 전체 ${ranked.length}개`;
+  $('#reroll').hidden=remaining<=0;
+  $('#reroll').firstChild.textContent=`더 보기 ${Math.min(PAGE_SIZE,remaining)}개 `;
 }
 // 사진마다 검색한 결과를 공고 단위로 합친다: 가장 높은 점수를 쓰고, 몇 장에서 나왔는지 센다.
 function mergeResults(lists){
@@ -151,7 +153,7 @@ $('#photoGrid').addEventListener('click',event=>{const remove=event.target.close
 ['dragover','dragleave','drop'].forEach(type=>$('#photoGrid').addEventListener(type,event=>{event.preventDefault();$('#photoGrid').classList.toggle('dragging',type==='dragover');if(type==='drop'){selectedDemoId='';addPhotos(event.dataTransfer.files)}}));
 $('#sido').addEventListener('change',event=>fillSigungu(event.target.value));
 $('#sigungu').addEventListener('change',updateDetailPlaceholder);
-$('#reroll').addEventListener('click',()=>{const pages=Math.ceil(ranked.length/PAGE_SIZE);page=(page+1)%pages;renderLivePage();$('.results-panel').scrollIntoView({behavior:'smooth',block:'start'})});
+$('#reroll').addEventListener('click',()=>{if((page+1)*PAGE_SIZE<ranked.length){page+=1;renderLivePage()}});
 button.addEventListener('click',async()=>{
   const breed=$('#breed').value.trim();
   if(!breed){$('#resultState').textContent='강아지 종을 선택해 주세요. 모르면 ‘모름’을 고르면 돼요.';$('#breed').focus();return}
@@ -162,7 +164,7 @@ button.addEventListener('click',async()=>{
       if(!photos.length)throw new Error('실제 검색에는 사진이 필요합니다.');
       const lists=[];
       for(const [i,photo] of photos.entries()){button.firstChild.textContent=photos.length>1?`사진 ${i+1}/${photos.length} 검색 중… `:'실제 공고 검색 중… ';lists.push(await searchPhoto(photo.file,fields))}
-      ranked=mergeResults(lists);page=0;renderLivePage();
+      ranked=mergeResults(lists).slice(0,SERVER_TOP_K);page=0;renderLivePage();
       $('#resultState').textContent=(selectedDemoId?'동일 사진을 제외하고 같은 개체의 다른 사진을 포함한 후보입니다.':'Mac 검색 엔진이 반환한 실제 공개 공고 후보입니다.')+(photos.length>1?` 사진 ${photos.length}장의 결과를 합쳤어요.`:'');
     }else{
       button.firstChild.textContent='합성 후보 정렬 중… ';
