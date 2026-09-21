@@ -67,6 +67,15 @@ function locationText(){
   const sigungu=$('#sigungu').value;
   return [$('#sido').value,sigungu===OTHER_SIGUNGU?'':sigungu,$('#locationDetail').value.trim()].filter(Boolean).join(' ');
 }
+function locationFields(){
+  const sigungu=$('#sigungu').value;
+  return {
+    location_text:locationText(),
+    location_province:$('#sido').value,
+    location_city:sigungu===OTHER_SIGUNGU?'':sigungu,
+    location_detail:$('#locationDetail').value.trim()
+  };
+}
 function featureText(){
   const breed=$('#breed').value.trim(),weight=$('#weight').value.trim();
   return [breed===UNKNOWN_BREED?'':breed,$('#furColor').value.trim(),weight?`${weight}kg`:'',$('#tail').value.trim(),$('#features').value.trim()].filter(Boolean).join(', ');
@@ -76,11 +85,23 @@ function featureText(){
 function renderStatic(list){ranked=[];$('#pager').hidden=true;results.innerHTML=list.map((x,i)=>`<article class="candidate"><div class="dog" aria-hidden="true">🐕</div><div><h3>${i+1}. ${x.name}</h3><p>${x.place} · ${x.date}</p></div><div class="score"><strong>${x.score}%</strong><small>예시 유사도</small></div></article>`).join('')}
 // 국가동물보호정보시스템 공고 상세 페이지. animal_id가 공고번호(desertionNo)다.
 const noticeUrl=id=>/^\d{10,20}$/.test(String(id??''))?`https://www.animal.go.kr/front/awtis/public/publicDtl.do?desertionNo=${id}`:'';
+const scoreLabel={image:'이미지',feature:'특징',location:'위치',date:'날짜'};
+function scoreBreakdown(item){
+  const scores=item.contributions&&typeof item.contributions==='object'
+    ?Object.entries(item.contributions).filter(([name])=>scoreLabel[name]).map(([name,value])=>`${scoreLabel[name]} ${(Number(value)*100).toFixed(1)}%`)
+    :[];
+  if(scores.length)return `<p><b>항목별 유사도</b> · ${safe(scores.join(' · '))}</p>`;
+  return item.rationale?`<p><b>항목별 유사도</b> · ${safe(item.rationale)}</p>`:'';
+}
 function renderLivePage(){
   const start=page*PAGE_SIZE,list=ranked.slice(start,start+PAGE_SIZE);
   results.innerHTML=list.map((x,i)=>{
     const url=noticeUrl(x.animal_id),state=String(x.process_state||''),ended=state.startsWith('종료');
-    const body=`<img class="dog result-photo" src="${apiBase}/api/public/animals/${encodeURIComponent(x.animal_id)}/image?slot=${encodeURIComponent(x.image_slot||'popfile1')}" alt="${safe(x.kind_name||'보호 공고')} 후보 사진" loading="lazy"><div><h3>${start+i+1}. ${safe(x.kind_name||'품종 미상')} · ${safe(x.sex||'성별 미상')}${state?` <span class="state-badge${ended?' ended':''}">${safe(state)}</span>`:''}</h3><p>${safe(x.happen_place||'발견 장소 미상')} · ${safe(x.happen_date||'날짜 미상')}</p>${x.care_name?`<p class="care">${safe(x.care_name)}</p>`:''}${x.photoHits>1?`<p>사진 ${x.photoHits}장에서 발견</p>`:''}${url?'<p class="notice-link">공고 보기 ↗</p>':''}</div><div class="score"><strong>${(Number(x.final_score||0)*100).toFixed(1)}%</strong><small>후보 점수</small></div>`;
+    const metadataReasons=[];
+    if(x.location_score!==null&&x.location_score!==undefined)metadataReasons.push(`위치: ${x.location_reason}`);
+    if(x.date_score!==null&&x.date_score!==undefined)metadataReasons.push(`날짜: ${x.date_reason}`);
+    const reasonDetail=metadataReasons.length?`<p>${safe(metadataReasons.join(' · '))}</p>`:'';
+    const body=`<img class="dog result-photo" src="${apiBase}/api/public/animals/${encodeURIComponent(x.animal_id)}/image?slot=${encodeURIComponent(x.image_slot||'popfile1')}" alt="${safe(x.kind_name||'보호 공고')} 후보 사진" loading="lazy"><div><h3>${start+i+1}. ${safe(x.kind_name||'품종 미상')} · ${safe(x.sex||'성별 미상')}${state?` <span class="state-badge${ended?' ended':''}">${safe(state)}</span>`:''}</h3><p>${safe(x.happen_place||'발견 장소 미상')} · ${safe(x.happen_date||'날짜 미상')}</p>${x.care_name?`<p class="care">${safe(x.care_name)}</p>`:''}${scoreBreakdown(x)}${reasonDetail}${x.photoHits>1?`<p>사진 ${x.photoHits}장에서 발견</p>`:''}${url?'<p class="notice-link">공고 보기 ↗</p>':''}</div><div class="score"><strong>${(Number(x.final_score||0)*100).toFixed(1)}%</strong><small>후보 점수</small></div>`;
     const cls=`candidate${ended?' ended':''}`;
     return url?`<a class="${cls} candidate-link" href="${url}" target="_blank" rel="noopener noreferrer" aria-label="${safe(x.kind_name||'보호 공고')} 공고를 국가동물보호정보시스템에서 보기 (새 탭)">${body}</a>`:`<article class="${cls}">${body}</article>`;
   }).join('');
@@ -134,7 +155,7 @@ $('#reroll').addEventListener('click',()=>{const pages=Math.ceil(ranked.length/P
 button.addEventListener('click',async()=>{
   const breed=$('#breed').value.trim();
   if(!breed){$('#resultState').textContent='강아지 종을 선택해 주세요. 모르면 ‘모름’을 고르면 돼요.';$('#breed').focus();return}
-  const fields={feature_text:featureText(),location_text:locationText(),missing_date:$('#date').value,exclude_exact_image:String(Boolean(selectedDemoId))};
+  const fields={feature_text:featureText(),...locationFields(),missing_date:$('#date').value,exclude_exact_image:String(Boolean(selectedDemoId))};
   button.disabled=true;
   try{
     if(live){
