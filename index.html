@@ -7,8 +7,8 @@
   <meta property="og:title" content="찾아줘, 가나디 공개 데모">
   <meta property="og:description" content="실종견 사진으로 보호 공고 후보를 좁혀보는 안전한 정적 체험판">
   <title>찾아줘, 가나디 · 공개 데모</title>
-  <link rel="stylesheet" href="./styles.css?v=4">
-  <link rel="stylesheet" href="./mobile.css?v=4">
+  <link rel="stylesheet" href="./styles.css?v=20260921-1547">
+  <link rel="stylesheet" href="./mobile.css?v=20260921-1547">
 </head>
 <body>
   <header class="topbar">
@@ -38,24 +38,29 @@
             <input id="breed" list="breedList" autocomplete="off" placeholder="눌러서 선택 · 모르면 ‘모름’">
             <datalist id="breedList"></datalist>
           </label>
-          <fieldset class="region">
-            <legend>특징 <small>선택</small></legend>
-            <div class="region-row">
-              <input id="furColor" aria-label="털 색깔" placeholder="털 색깔 예: 흰색">
-              <input id="weight" type="number" min="0" step="0.1" inputmode="decimal" aria-label="몸무게(kg)" placeholder="몸무게(kg) 예: 4.5">
+          <details class="optional-fields" open>
+            <summary><span>추가 검색 조건 <small>선택</small></span><span class="toggle-label" aria-hidden="true"></span></summary>
+            <div class="optional-fields-body">
+              <fieldset class="region">
+                <legend>특징 <small>선택</small></legend>
+                <div class="region-row">
+                  <input id="furColor" aria-label="털 색깔" placeholder="털 색깔 예: 흰색">
+                  <input id="weight" type="number" min="0" step="0.1" inputmode="decimal" aria-label="몸무게(kg)" placeholder="몸무게(kg) 예: 4.5">
+                </div>
+                <input id="tail" aria-label="꼬리" placeholder="꼬리 예: 단미, 말린 꼬리">
+                <input id="features" aria-label="그 외 특징" placeholder="그 외 특징 예: 갈색 귀, 빨간 목줄">
+              </fieldset>
+              <fieldset class="region">
+                <legend>실종 장소 <small>선택</small></legend>
+                <div class="region-row">
+                  <select id="sido" aria-label="시·도"><option value="">시·도 선택</option></select>
+                  <select id="sigungu" aria-label="시·군·구" disabled><option value="">시·군·구</option></select>
+                </div>
+                <input id="locationDetail" aria-label="상세 위치" placeholder="읍·면·동 (선택) 예: 사당동">
+              </fieldset>
+              <label>실종 날짜 <small>선택</small><input id="date" type="date"></label>
             </div>
-            <input id="tail" aria-label="꼬리" placeholder="꼬리 예: 단미, 말린 꼬리">
-            <input id="features" aria-label="그 외 특징" placeholder="그 외 특징 예: 갈색 귀, 빨간 목줄">
-          </fieldset>
-          <fieldset class="region">
-            <legend>실종 장소 <small>선택</small></legend>
-            <div class="region-row">
-              <select id="sido" aria-label="시·도"><option value="">시·도 선택</option></select>
-              <select id="sigungu" aria-label="시·군·구" disabled><option value="">시·군·구</option></select>
-            </div>
-            <input id="locationDetail" aria-label="상세 위치" placeholder="읍·면·동 (선택) 예: 사당동">
-          </fieldset>
-          <label>실종 날짜 <small>선택</small><input id="date" type="date"></label>
+          </details>
         </div>
         <button id="search" type="button">유사 후보 살펴보기 <span>→</span></button>
         <p class="privacy">합성 모드에서는 브라우저 안에서만 동작합니다. Mac 검색 서버 연결 시 사진과 입력값은 검색을 위해 일시 전송되며 서버에 저장하지 않습니다.</p>

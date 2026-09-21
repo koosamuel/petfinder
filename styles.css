@@ -54,3 +54,13 @@
 .state-badge.ended{background:#efece3;color:var(--muted)}
 .candidate.ended{background:#faf9f5}
 .candidate.ended .result-photo,.candidate.ended .score strong{opacity:.55}
+
+.optional-fields{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden}
+.optional-fields>summary{padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink);font-size:13px;font-weight:800;cursor:pointer;list-style:none;user-select:none}
+.optional-fields>summary::-webkit-details-marker{display:none}
+.optional-fields>summary small{font-size:10px;font-weight:600;color:var(--muted);margin-left:3px}
+.optional-fields>summary:focus-visible{outline:3px solid rgba(30,102,86,.22);outline-offset:-3px}
+.optional-fields .toggle-label::after{content:'접기 ︿';color:var(--green);font-size:11px;white-space:nowrap}
+.optional-fields:not([open]) .toggle-label::after{content:'펼치기 ﹀'}
+.optional-fields-body{display:grid;gap:14px;padding:2px 14px 14px;border-top:1px solid var(--line)}
+.optional-fields-body .region:first-child{margin-top:12px}
