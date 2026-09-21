@@ -31,6 +31,7 @@
 .fields select:disabled{background:#f3f2ec;color:var(--muted)}
 .fields select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,102,86,.1)}
 .region input{margin-top:8px}
+#sex{margin-top:8px}
 
 /* ---- 결과 10개씩 ---- */
 .result-photo{object-fit:contain;background:var(--soft)}

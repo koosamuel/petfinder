@@ -15,8 +15,8 @@ const demoCandidates={
 const demos=[
   // Every prepared demo has at least two available photos for one notice:
   // popfile1 is the query and popfile2 remains as a cross-view candidate.
-  {id:'shiba',label:'예시 1',name:'갈색 시바',image:'./assets/demo-shiba.jpg',breed:'시바',furColor:'갈색',weight:'',tail:'말린 꼬리',feature:'뾰족한 귀, 중형견',sido:'경기도',sigungu:'화성시',date:'2026-09-08',animalId:'441553202602531',availablePhotos:2},
-  {id:'dachshund',label:'예시 2',name:'닥스훈트',image:'./assets/demo-dachshund.jpg',breed:'닥스훈트',furColor:'검정·갈색',weight:'',tail:'',feature:'긴 몸, 짧은 다리',sido:'경기도',sigungu:'안성시',date:'2026-09-08',animalId:'441408202601716',availablePhotos:2}
+  {id:'shiba',label:'예시 1',name:'갈색 시바',image:'./assets/demo-shiba.jpg',breed:'시바',sex:'',furColor:'갈색',weight:'',tail:'말린 꼬리',feature:'뾰족한 귀, 중형견',sido:'경기도',sigungu:'화성시',date:'2026-09-08',animalId:'441553202602531',availablePhotos:2},
+  {id:'dachshund',label:'예시 2',name:'닥스훈트',image:'./assets/demo-dachshund.jpg',breed:'닥스훈트',sex:'',furColor:'검정·갈색',weight:'',tail:'',feature:'긴 몸, 짧은 다리',sido:'경기도',sigungu:'안성시',date:'2026-09-08',animalId:'441408202601716',availablePhotos:2}
 ];
 const MAX_PHOTOS=5,PAGE_SIZE=5,SERVER_TOP_K=10,UNKNOWN_BREED='모름',OTHER_SIGUNGU='__other__';
 const $=selector=>document.querySelector(selector);
@@ -76,9 +76,10 @@ function locationFields(){
     location_detail:$('#locationDetail').value.trim()
   };
 }
+const SEX_LABEL={F:'암컷',M:'수컷'};
 function featureText(){
   const breed=$('#breed').value.trim(),weight=$('#weight').value.trim();
-  return [breed===UNKNOWN_BREED?'':breed,$('#furColor').value.trim(),weight?`${weight}kg`:'',$('#tail').value.trim(),$('#features').value.trim()].filter(Boolean).join(', ');
+  return [breed===UNKNOWN_BREED?'':breed,SEX_LABEL[$('#sex').value]||'',$('#furColor').value.trim(),weight?`${weight}kg`:'',$('#tail').value.trim(),$('#features').value.trim()].filter(Boolean).join(', ');
 }
 
 // ---- 결과: 처음 5개, 요청 시 나머지 5개 더 보기 ----
@@ -130,7 +131,7 @@ async function selectDemo(id){
   selectedDemoId=id;
   const blob=await fetch(demo.image).then(r=>r.blob());
   clearPhotos();addPhotos([new File([blob],`${demo.id}.jpg`,{type:blob.type||'image/jpeg'})]);
-  $('#breed').value=demo.breed;$('#furColor').value=demo.furColor||'';$('#weight').value=demo.weight||'';$('#tail').value=demo.tail||'';$('#features').value=demo.feature||'';$('#date').value=demo.date;
+  $('#breed').value=demo.breed;$('#sex').value=demo.sex||'';$('#furColor').value=demo.furColor||'';$('#weight').value=demo.weight||'';$('#tail').value=demo.tail||'';$('#features').value=demo.feature||'';$('#date').value=demo.date;
   $('#sido').value=demo.sido;fillSigungu($('#sido').value);$('#sigungu').value=demo.sigungu;$('#locationDetail').value='';updateDetailPlaceholder();
   document.querySelectorAll('.demo-option').forEach(node=>{const selected=node.dataset.demo===id;node.classList.toggle('selected',selected);node.setAttribute('aria-pressed',String(selected))});
   if(live){$('#resultState').textContent=`${demo.name} 예시가 준비되었습니다. ‘유사 후보 살펴보기’를 눌러보세요.`}else{renderStatic(demoCandidates[id]);$('#resultState').textContent=`${demo.name} 합성 예시 후보로 업데이트했습니다.`}
@@ -157,7 +158,7 @@ $('#reroll').addEventListener('click',()=>{if((page+1)*PAGE_SIZE<ranked.length){
 button.addEventListener('click',async()=>{
   const breed=$('#breed').value.trim();
   if(!breed){$('#resultState').textContent='강아지 종을 선택해 주세요. 모르면 ‘모름’을 고르면 돼요.';$('#breed').focus();return}
-  const fields={feature_text:featureText(),...locationFields(),missing_date:$('#date').value,exclude_exact_image:String(Boolean(selectedDemoId))};
+  const fields={feature_text:featureText(),sex:$('#sex').value,...locationFields(),missing_date:$('#date').value,exclude_exact_image:String(Boolean(selectedDemoId))};
   button.disabled=true;
   try{
     if(live){
