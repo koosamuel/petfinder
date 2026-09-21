@@ -175,4 +175,7 @@ button.addEventListener('click',async()=>{
   finally{button.disabled=false;button.firstChild.textContent='유사 후보 살펴보기 ';$('.results-panel').scrollIntoView({behavior:'smooth',block:'start'})}
 });
 async function startDemo(){renderPhotos();renderDemos();renderStatic(demoCandidates.shiba);await Promise.all([initialize(),loadOptions()]);await selectDemo('shiba')}
+const optionalFields=$('.optional-fields');
+optionalFields.open=false;
+window.addEventListener('pageshow',()=>{optionalFields.open=false});
 startDemo();
