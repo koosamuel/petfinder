@@ -110,7 +110,7 @@ function renderLivePage(){
   $('#pager').hidden=ranked.length<=PAGE_SIZE;
   $('#pageInfo').textContent=`1–${visibleCount}위 / 전체 ${ranked.length}개`;
   $('#reroll').hidden=remaining<=0;
-  $('#reroll').firstChild.textContent=`더 보기 ${Math.min(PAGE_SIZE,remaining)}개 `;
+  $('#reroll').firstChild.textContent=`다음 후보 ${Math.min(PAGE_SIZE,remaining)}개 `;
 }
 // 사진마다 검색한 결과를 공고 단위로 합친다: 가장 높은 점수를 쓰고, 몇 장에서 나왔는지 센다.
 function mergeResults(lists){
