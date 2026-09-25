@@ -18,7 +18,7 @@ const demos=[
   {id:'shiba',label:'예시 1',name:'갈색 시바',image:'./assets/demo-shiba.jpg',breed:'시바',sex:'',furColor:'갈색',weight:'',tail:'말린 꼬리',feature:'뾰족한 귀, 중형견',sido:'경기도',sigungu:'화성시',date:'2026-09-08',animalId:'441553202602531',availablePhotos:2},
   {id:'dachshund',label:'예시 2',name:'닥스훈트',image:'./assets/demo-dachshund.jpg',breed:'닥스훈트',sex:'',furColor:'검정·갈색',weight:'',tail:'',feature:'긴 몸, 짧은 다리',sido:'경기도',sigungu:'안성시',date:'2026-09-08',animalId:'441408202601716',availablePhotos:2}
 ];
-const MAX_PHOTOS=5,PAGE_SIZE=5,SERVER_TOP_K=10,UNKNOWN_BREED='모름',OTHER_SIGUNGU='__other__';
+const MAX_PHOTOS=5,PAGE_SIZE=5,SERVER_TOP_K=100,UNKNOWN_BREED='모름',OTHER_SIGUNGU='__other__';
 const $=selector=>document.querySelector(selector);
 const results=$('#results');
 const button=$('#search');
